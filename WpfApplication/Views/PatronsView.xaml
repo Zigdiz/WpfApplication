@@ -1,0 +1,75 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApplication"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:converters="clr-namespace:WpfApplication.Converters"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:viewModels="clr-namespace:WpfApplication.ViewModels"
+             x:Class="WpfApplication.Views.PatronsView"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+            DataContext="{dxmvvm:ViewModelSource Type={x:Type viewModels:PatronViewModel}}"
+            d:DataContext="{d:DesignInstance viewModels:PatronViewModel}">
+
+    <dxmvvm:Interaction.Behaviors>
+        <dx:DXMessageBoxService />
+    </dxmvvm:Interaction.Behaviors>
+
+    <UserControl.Resources>
+        <converters:HasExpiredLoansConverter x:Key="HasExpiredLoansConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <dxlc:LayoutControl Orientation="Vertical">
+            <dxlc:LayoutGroup View="GroupBox" IsCollapsible="True" Header="Search" VerticalAlignment="Top" HorizontalAlignment="Left">
+                <dxlc:LayoutItem Label="First Name">
+                    <dxe:TextEdit Width="150" EditValue="{Binding FirstNameSearchCriteria, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Last name">
+                    <dxe:TextEdit Width="150" EditValue="{Binding LastNameSearchCriteria, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Address">
+                    <dxe:TextEdit Width="150" EditValue="{Binding AddressSearchCriteriaNameSearchCriteria, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem Label="Have expired loans">
+                    <dxe:CheckEdit IsChecked="{Binding HasExpiredLoans}"/>
+                </dxlc:LayoutItem>
+                <Button Command="{Binding SearchCommand}">Search</Button>
+            </dxlc:LayoutGroup>
+
+            <dxlc:LayoutControl VerticalAlignment="Top" HorizontalAlignment="Left">
+                <Button Command="{Binding SaveCommand}">Save</Button>
+                <Button Command="{Binding NewPatronCommand}">New patron</Button>
+                <Button Command="{Binding DeletePatronCommand}">Delete patron</Button>
+            </dxlc:LayoutControl>
+            <dxg:GridControl  ItemsSource="{Binding Patrons}" SelectedItem="{Binding SelectedPatron}">
+                <dxg:GridControl.Resources>
+                    <Style x:Key="ExpiredCellStyle" TargetType="{x:Type dxg:LightweightCellEditor}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding RowData.Row, Converter={StaticResource HasExpiredLoansConverter}}" Value="true">
+                                <Setter Property="Background" Value="IndianRed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </dxg:GridControl.Resources>
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn FieldName="FirstName" Header="First name"/>
+                    <dxg:GridColumn FieldName="LastName" Header="Last name"/>
+                    <dxg:GridColumn FieldName="Address" Header="Address"/>
+                    <dxg:GridColumn FieldName="Phone" Header="Phone"/>
+                    <dxg:GridColumn FieldName="CurrentLoans" Header="Loans" AllowEditing="False"/>
+                    <dxg:GridColumn Header="Have expired loans" AllowEditing="False" CellStyle="{StaticResource ExpiredCellStyle}"/>
+                </dxg:GridControl.Columns>
+                <dxg:GridControl.View>
+                    <dxg:TableView AllowPerPixelScrolling="True" />
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dxlc:LayoutControl>
+    </Grid>
+</UserControl>
